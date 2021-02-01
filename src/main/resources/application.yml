@@ -1,0 +1,7 @@
+searcher:
+  column-number: 2
+  ignore-case: true
+
+spring:
+  main:
+    web-application-type: none
