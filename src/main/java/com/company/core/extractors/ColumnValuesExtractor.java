@@ -8,13 +8,13 @@ import org.springframework.stereotype.Component;
 
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
 
 @Component
 @Primary
-public class ColumnValuesExtractor implements CvsDataExtractor {
+public class ColumnValuesExtractor implements DataManager {
     private final Multimap<String, String> fileContent;
-
     private final int columnNumber;
 
     public ColumnValuesExtractor(int columnNumber) {
@@ -41,5 +41,13 @@ public class ColumnValuesExtractor implements CvsDataExtractor {
         }
 
         return fileContent.keySet().toArray(new String[0]);
+    }
+
+    @Override
+    public String[] transformData(String[] data) {
+        var result = new ArrayList<String>();
+        for (String datum : data)
+            result.addAll(fileContent.get(datum));
+        return result.toArray(new String[0]);
     }
 }
