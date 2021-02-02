@@ -1,6 +1,5 @@
 package com.company.core.searchers;
 
-import com.company.utils.BinarySearch;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Component;
 
@@ -14,24 +13,49 @@ public class PrefixSearcher implements ISearcher {
 
     @Override
     public String[] search(String[] target, String query) {
-        comparator.setEndIndex(query.length());
-        var leftIndex = BinarySearch.getFirstOccurrence(target, query, 0, target.length, comparator);  // TODO: check indices
-        var rightIndex = BinarySearch.getLastOccurrence(target, query, leftIndex, target.length, comparator);
-        return Arrays.copyOfRange(target, leftIndex, rightIndex);
+        var leftIndex = getFirstOccurrence(target, query, 0, target.length - 1);
+        if (leftIndex == -1)
+            return new String[0];
+
+        var rightIndex = getLastOccurrence(target, query, leftIndex, target.length - 1);
+        return Arrays.copyOfRange(target, leftIndex, rightIndex + 1);
     }
 
-    public static class PrefixComparator implements Comparator<String> {
-        private int endIndex;
-
-        public void setEndIndex(int index) {
-            this.endIndex = index;
+    private int getFirstOccurrence(String[] target, String key, int start, int end) {
+        while (start < end - 1) {
+            var mid = (start + end) / 2;
+            if (comparator.compare(key, target[mid]) > 0)
+                start = mid;
+            else
+                end = mid;
         }
 
+        if (comparator.compare(key, target[end]) != 0)
+            return -1;
+
+        return end;
+    }
+
+    private int getLastOccurrence(String[] target, String key, int start, int end) {
+        while (start < end - 1) {
+            var mid = (start + end) / 2;
+            if (comparator.compare(key, target[mid]) >= 0)
+                start = mid;
+            else
+                end = mid;
+        }
+
+        if (comparator.compare(key, target[start]) != 0)
+            return -1;
+
+        return start;
+    }
+
+    private static class PrefixComparator implements Comparator<String> {
         @Override
-        public int compare(String o1, String o2) {
-            var firstIndex = Math.min(o1.length(), endIndex);
-            var secondIndex = Math.min(o2.length(), endIndex);
-            return o1.substring(0, firstIndex).compareTo(o2.substring(0, secondIndex));
+        public int compare(String prefix, String s) {
+            var index = Math.min(prefix.length(), s.length());
+            return prefix.compareTo(s.substring(0, index));
         }
     }
 }
