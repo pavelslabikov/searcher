@@ -1,6 +1,6 @@
-searcher:
+app:
   column-number: 2
-  ignore-case: true
+  filename: "./src/main/resources/airports.dat"
 
 spring:
   main:
