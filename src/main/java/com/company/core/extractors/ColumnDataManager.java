@@ -16,14 +16,14 @@ import java.util.Arrays;
 @Component
 @Scope("prototype")
 @PropertySource("classpath:application.yml")
-public class ColumnValuesExtractor implements DataManager {
+public class ColumnDataManager implements DataManager {
     private final Multimap<String, String> fileContent;
-    private final String filename;
+    private final String pathToFile;
     private final int columnNumber;
 
-    public ColumnValuesExtractor(@Value("${app.filename}") String filename,
-                                 @Value("${app.column-number}") int number) {
-        this.filename = filename;
+    public ColumnDataManager(@Value("${app.filename}") String pathToFile,
+                             @Value("${app.column-number}") int number) {
+        this.pathToFile = pathToFile;
         fileContent = TreeMultimap.create();
         if (number <= 0)
             throw new IllegalArgumentException("Номер колонки должен быть > 0");
@@ -33,7 +33,7 @@ public class ColumnValuesExtractor implements DataManager {
 
     @Override
     public String[] extractData() {
-        try (var reader = new CSVReader(new FileReader(filename))) {
+        try (var reader = new CSVReader(new FileReader(pathToFile))) {
             String[] nextLine;
             while (true) {
                 nextLine = reader.readNext();
