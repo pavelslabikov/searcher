@@ -1,5 +1,5 @@
 package com.company.core.searchers;
 
-public interface ISearcher {
+public interface Searcher {
     String[] search(String[] target, String query);
 }

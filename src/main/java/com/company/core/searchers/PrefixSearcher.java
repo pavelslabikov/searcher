@@ -8,7 +8,7 @@ import java.util.Comparator;
 
 @Component
 @Scope("prototype")
-public class PrefixSearcher implements ISearcher {
+public class PrefixSearcher implements Searcher {
     private final PrefixComparator comparator = new PrefixComparator();
 
     @Override
