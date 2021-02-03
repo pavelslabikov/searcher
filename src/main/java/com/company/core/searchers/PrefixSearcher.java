@@ -1,19 +1,19 @@
 package com.company.core.searchers;
 
-import org.springframework.context.annotation.Primary;
+import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 import java.util.Arrays;
 import java.util.Comparator;
 
 @Component
-@Primary
+@Scope("prototype")
 public class PrefixSearcher implements ISearcher {
     private final PrefixComparator comparator = new PrefixComparator();
 
     @Override
     public String[] search(String[] target, String query) {
-        var leftIndex = getFirstOccurrence(target, query, 0, target.length - 1);
+        var leftIndex = getFirstOccurrence(target, query);
         if (leftIndex == -1)
             return new String[0];
 
@@ -21,34 +21,36 @@ public class PrefixSearcher implements ISearcher {
         return Arrays.copyOfRange(target, leftIndex, rightIndex + 1);
     }
 
-    private int getFirstOccurrence(String[] target, String key, int start, int end) {
-        while (start < end - 1) {
-            var mid = (start + end) / 2;
+    private int getFirstOccurrence(String[] target, String key) {
+        var left = 0;
+        var right = target.length - 1;
+        while (left < right - 1) {
+            var mid = (left + right) / 2;
             if (comparator.compare(key, target[mid]) > 0)
-                start = mid;
+                left = mid;
             else
-                end = mid;
+                right = mid;
         }
 
-        if (comparator.compare(key, target[end]) != 0)
+        if (comparator.compare(key, target[right]) != 0)
             return -1;
 
-        return end;
+        return right;
     }
 
-    private int getLastOccurrence(String[] target, String key, int start, int end) {
-        while (start < end - 1) {
-            var mid = (start + end) / 2;
+    private int getLastOccurrence(String[] target, String key, int left, int right) {
+        while (left < right - 1) {
+            var mid = (left + right) / 2;
             if (comparator.compare(key, target[mid]) >= 0)
-                start = mid;
+                left = mid;
             else
-                end = mid;
+                right = mid;
         }
 
-        if (comparator.compare(key, target[start]) != 0)
+        if (comparator.compare(key, target[left]) != 0)
             return -1;
 
-        return start;
+        return left;
     }
 
     private static class PrefixComparator implements Comparator<String> {
