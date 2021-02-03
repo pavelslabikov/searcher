@@ -13,6 +13,9 @@ public class PrefixSearcher implements Searcher {
 
     @Override
     public String[] search(String[] target, String query) {
+        if (target.length == 0)
+            return target;
+
         var leftIndex = getFirstOccurrence(target, query);
         if (leftIndex == -1)
             return new String[0];
